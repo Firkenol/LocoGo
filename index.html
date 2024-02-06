@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module" src="LocoGo.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+    <script>
+import 'regenerator-runtime/runtime';
+import axios from 'axios';
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+        });
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+      }
+      const URL = 'https://maps.googleapis.com/maps/api/distancematrix/json??origins=$' + latitude + ',$' + longitude + '&destinations=$' + 40.69055 + ",$" + -74.17761 + "&key=AIzaSyBK3ScfWDHp9JiVX7KNHmJd4b1fs1--Uy4";
+    axios.get(URL).then(response => {console.log(response)}).catch(error=>{console.log(error)});</script> 
+</body>
+</html>
