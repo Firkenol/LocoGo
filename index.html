@@ -7,19 +7,16 @@
 </head>
 <body>
     <script type = "module" src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.3/axios.min.js' integrity='sha512-L4lHq2JI/GoKsERT8KYa72iCwfSrKYWEyaBxzJeeITM9Lub5vlTj8tufqYk056exhjo2QDEipJrg6zen/DDtoQ==' crossorigin='anonymous' referrerpolicy='no-referrer'>
-        const buttonElement = document.querySelector('.Test');
-        buttonElement.addEventListener('click',takeData());
         import axios from 'axios';
-        function takeData(){
+        window.document.onload = function takeData(){
             const requestOptions = {
                 method: 'GET',
                 headers: {
                     'mode':'cors',
                 }
               };
-        const URL = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=${40.493629},{-74.504768}&destinations=${40.689491}, ${-74.174538}&key=AIzaSyBK3ScfWDHp9JiVX7KNHmJd4b1fs1--Uy4";
-        axios.get(URL).then(response => {console.log(response.message)}).catch(error => {console.log(error.message)}) ;
+        const URL = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=40.493629%2C-74.504768&origins=40.689491%2C-74.174538&key=AIzaSyBK3ScfWDHp9JiVX7KNHmJd4b1fs1--Uy4";
+        axios.get(URL).then(res => {console.log(res.data)}).catch(error => {console.log(error)}) ;
         }</script>
-    <button class="Test">Test Button</button>
 </body>
 </html>
