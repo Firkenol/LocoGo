@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src = "https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
 <body>
-    <script type = "module" src='https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.3/axios.min.js' integrity='sha512-L4lHq2JI/GoKsERT8KYa72iCwfSrKYWEyaBxzJeeITM9Lub5vlTj8tufqYk056exhjo2QDEipJrg6zen/DDtoQ==' crossorigin='anonymous' referrerpolicy='no-referrer'>
-        import axios from 'axios';
-        window.document.onload = function takeData(){
-            const requestOptions = {
-                method: 'GET',
-                headers: {
-                    'mode':'cors',
-                }
-              };
+    <script type = "module">
+        document.addEventListener("DOMContentLoaded", takeData());
+        async function takeData(){
         const URL = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=40.493629%2C-74.504768&origins=40.689491%2C-74.174538&key=AIzaSyBK3ScfWDHp9JiVX7KNHmJd4b1fs1--Uy4";
-        axios.get(URL).then(res => {console.log(res.data)}).catch(error => {console.log(error)}) ;
-        }</script>
+        const result = await axios.get(URL);
+        console.log(result);
+        }
+        </script>
 </body>
 </html>
