@@ -2,18 +2,62 @@
 <html lang="en">
 <head>
     <script src = "https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
 <body>
+    <input type = "text" id = "inputText" placeholder = "Input your airport's IATA Code">
+    <button type="button" id = "clickButton"></button>
+    <text>
     <script type = "module">
-        document.addEventListener("DOMContentLoaded", takeData());
-        async function takeData(){
-        const URL = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=40.493629%2C-74.504768&origins=40.689491%2C-74.174538&key=AIzaSyBK3ScfWDHp9JiVX7KNHmJd4b1fs1--Uy4";
+        var airplaneID = "";
+        const button = document.getElementById("clickButton");
+        button.addEventListener("click", async function(){
+            airplaneID = document.getElementById('inputText').value;
+            const options = {
+  method: 'GET',
+  url: 'https://airport-info.p.rapidapi.com/airport',
+  params: {iata: ""+airplaneID},
+  headers: {
+    'X-RapidAPI-Key': '31b63c1f91msh03311155afd7261p1005d7jsn6c3149d1aa4b',
+    'X-RapidAPI-Host': 'airport-info.p.rapidapi.com'
+  }
+};
+
+try {   
+    async function success(position) {
+    const latitudeOrigin = position.coords.latitude;
+    const longitudeOrigin = position.coords.longitude;
+    const response = await axios.request(options);
+	console.log(response.data);
+    console.log(response.data.latitude);
+    const latitudeDestination = response.data.latitude;
+    const longitudeDestination = response.data.longitude;
+        const URL = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + latitudeDestination + "%2C" + longitudeDestination + "&origins=" + latitudeOrigin + "%2C" + longitudeOrigin + "&key=AIzaSyBK3ScfWDHp9JiVX7KNHmJd4b1fs1--Uy4";
         const result = await axios.get(URL);
         console.log(result);
-        }
+        const tripLength = result.data.rows[0].elements[0].duration.value;
+        console.log(tripLength);
+
+  }
+
+  function error() {
+    console.log("Unable to retrieve your location");
+  }
+    if (!navigator.geolocation) {
+    console.log("Geolocation is not supported by your browser");
+  } else {
+    console.log("Locating…");
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+} catch (error) {
+    if(typeof error != undefined){
+        console.error(error);
+    }
+}
+        });
         </script>
 </body>
 </html>
