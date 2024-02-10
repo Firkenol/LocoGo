@@ -25,13 +25,17 @@
     'X-RapidAPI-Host': 'airport-info.p.rapidapi.com'
   }
 };
-
+const theUrl = 'https://www.tsawaittimes.com/api/airport/s79yMuRU0YPVmn2vuNtsVK9mU8krBA5d/'+ airplaneID + '/JSON';
+const options1 = {
+  method: 'GET',
+  url: theUrl,
+};
 try {   
     async function success(position) {
     const latitudeOrigin = position.coords.latitude;
     const longitudeOrigin = position.coords.longitude;
     const response = await axios.request(options);
-	console.log(response.data);
+	  console.log(response.data);
     console.log(response.data.latitude);
     const latitudeDestination = response.data.latitude;
     const longitudeDestination = response.data.longitude;
@@ -40,7 +44,13 @@ try {
         console.log(result);
         const tripLength = result.data.rows[0].elements[0].duration.value;
         console.log(tripLength);
-
+try {
+	const response1 = await axios.request(options1);
+	console.log(response1.data);
+  console.log(response1.data.rightnow);
+} catch (error) {
+	console.error(error);
+}
   }
 
   function error() {
