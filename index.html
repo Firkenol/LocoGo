@@ -8,14 +8,85 @@
     <title>Document</title>
 </head>
 <body>
-    <input type = "text" id = "inputText" placeholder = "Input your airport's IATA Code">
-    <button type="button" id = "clickButton"></button>
+  <label for="appt">Choose your airplane time and IATA Code:</label>
+    <input type = "text" id = "inputText" placeholder = "    ">
+    <p>Do you have TSA Precheck?</p>
+    <input type="radio" id="Yes" name="Precheck" value="True">
+    <label for="Yes">Yes</label><br>
+    <input type="radio" id="No" name="Precheck" value="False">
+    <label for="No">No</label><br>
+    <p>Is your flight international?</p>
+    <input type="radio" id="Yes" name="International" value="True">
+    <label for="Yes">Yes</label><br>
+    <input type="radio" id="No" name="International" value="False">
+    <label for="No">No</label><br>
+    <p>Are your bags checked?</p>
+    <input type="radio" id="Yes" name="BagsChecked" value="True">
+    <label for="Yes">Yes</label><br>
+    <input type="radio" id="No" name="BagsChecked" value="False">
+    <label for="No">No</label><br>
+    <p>Do you have to return a rental car?</p>
+    <input type="radio" id="Yes" name="ReturnRentalCar" value="True">
+    <label for="Yes">Yes</label><br>
+    <input type="radio" id="No" name="ReturnRentalCar" value="False">
+    <label for="No">No</label><br>
+    <p>What is the time of your flight?</p>
+    <input type="time" id="appt" name="appt"/>
+    <button type="button" id = "clickButton">Get your timeline now!</button>
     <text>
     <script type = "module">
+              /*Variables for buffer algorithm
+        Total buffer is the total buffer amount, is calculated through the if statements
+        Precheck is a boolean that equates to whether or not the user has TSA Precheck
+        International is a boolean that equates to whether or not the user's flight is international
+        BagsAreChecked is a boolean that equates to whether or not the user's bags are checked
+        ReturnRentalCar is a boolean that equates to whether or not the user has to return a rental car
+        These values are all found from the user's HTML input
+        */
+        var totalBuffer = 0;
+        var precheck;
+        var international;
+        var bagsAreChecked;
+        var returnRentalCar;
+        //Initialization to be able to call the API received data from outside of the functions
+        var realResponse;
+        var realResponse1;
+        //Initialization for Airplane ID and time of the flight based on user input
         var airplaneID = "";
+        var timeControl = "";
         const button = document.getElementById("clickButton");
         button.addEventListener("click", async function(){
             airplaneID = document.getElementById('inputText').value;
+            timeControl = document.querySelector('input[type="time"]');
+            const precheckButtons = document.querySelectorAll('input[name="Precheck"]');
+            for (const radioButton of precheckButtons) {
+                if (radioButton.checked) {
+                    precheck = radioButton.value;
+                    break;
+                }
+            }
+            const internationalButtons = document.querySelectorAll('input[name="International"]');
+            for (const radioButton of internationalButtons) {
+                if (radioButton.checked) {
+                    international = radioButton.value;
+                    break;
+                }
+            }
+            const bagsAreCheckedButtons = document.querySelectorAll('input[name="BagsChecked"]');
+            for (const radioButton of bagsAreCheckedButtons) {
+                if (radioButton.checked) {
+                    bagsAreChecked = radioButton.value;
+                    break;
+                }
+            }
+            const returnRentalCarButtons = document.querySelectorAll('input[name="ReturnRentalCar"]');
+            for (const radioButton of returnRentalCarButtons) {
+                if (radioButton.checked) {
+                    returnRentalCar = radioButton.value;
+                    break;
+                }
+            }
+        //Get requests for all of the appropriate APIs
             const options = {
   method: 'GET',
   url: 'https://airport-info.p.rapidapi.com/airport',
@@ -42,12 +113,134 @@ try {
         const URL = "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + latitudeDestination + "%2C" + longitudeDestination + "&origins=" + latitudeOrigin + "%2C" + longitudeOrigin + "&key=AIzaSyBK3ScfWDHp9JiVX7KNHmJd4b1fs1--Uy4";
         const result = await axios.get(URL);
         console.log(result);
-        const tripLength = result.data.rows[0].elements[0].duration.value;
+        const tripLength = parseInt(result.data.rows[0].elements[0].duration.value/60);
         console.log(tripLength);
+        realResponse = response;
 try {
 	const response1 = await axios.request(options1);
 	console.log(response1.data);
   console.log(response1.data.rightnow);
+          //Logic for buffer algorithm
+          totalBuffer+=tripLength;
+          if(precheck=="False" || response1.data.precheck == 0){
+          totalBuffer+=response1.data.rightnow;
+        }
+        if(international=="True"){
+          totalBuffer+=180;
+        }
+        else{
+          totalBuffer+=75;
+        }
+        if(bagsAreChecked="True"){
+          totalBuffer+=15;
+        }
+        if(returnRentalCar="True"){
+          totalBuffer+=30;
+        }
+console.log(totalBuffer);
+        //How many days ago you will have to leave in order to reach your flight. Only for final output, should not be greater than 1.
+        console.log(timeControl.value);
+        var hours=(totalBuffer-totalBuffer%60)/60;
+        var arrivalHourNumber = parseInt(timeControl.value.substring(0,2));
+        console.log(arrivalHourNumber);
+        if(timeControl.value.substring(5,7) == "PM"){
+          arrivalHourNumber+=12
+        }
+        console.log(hours);
+        console.log(arrivalHourNumber);
+        console.log(response1.data.estimated_hourly_times[0].waittime);
+        if(arrivalHourNumber-hours>0){
+            for(var i = arrivalHourNumber; i>arrivalHourNumber-hours;i--){
+          totalBuffer+=parseInt(response1.data.estimated_hourly_times[i].waittime);
+          }
+        }
+        else{
+          for(var i = 24-arrivalHourNumber;i>24-(arrivalHourNumber-hours);i--){
+            totalBuffer+=parseInt(response1.data.estimated_hourly_times[i].waittime);
+          }
+        }
+        console.log(totalBuffer);
+        var daysBehindOriginalForLeaving = 0;
+        var daysBehindOriginalForBeingAtAirport = 0;
+        var leaveTime = 0;
+        var timeToBeAtAirport = 0;
+        console.log(timeControl.value.substring(0,2));
+        console.log(timeControl.value.substring(3,5));
+        var departureTime = 0;
+        departureTime = (parseInt(timeControl.value.substring(0,2))*60+parseInt(timeControl.value.substring(3,5)));
+        console.log(departureTime);
+        var timeAtAirportCalculated = false;
+        var leaveTimeCalculated = false;
+        if(departureTime - totalBuffer > 0 && !timeAtAirportCalculated){
+          timeToBeAtAirport = departureTime - totalBuffer;
+          timeAtAirportCalculated=true;
+        }
+        else if(departureTime - totalBuffer < 0 && !timeAtAirportCalculated){
+          timeToBeAtAirport = (departureTime - totalBuffer);
+          while(timeToBeAtAirport < 0){
+            timeToBeAtAirport += 1440;
+            daysBehindOriginalForBeingAtAirport++;
+          }
+          timeAtAirportCalculated=true;
+        }
+        if(timeToBeAtAirport - tripLength > 0 && !leaveTimeCalculated){
+          leaveTime = timeToBeAtAirport - tripLength;
+          leaveTimeCalculated=true;
+        }
+        else if(timeToBeAtAirport-tripLength<0 && !leaveTimeCalculated){
+          leaveTime = (timeToBeAtAirport - tripLength);
+          while(leaveTime < 0){
+            leaveTime += 1440;
+            timeToBeAtAirport = (departureTime - totalBuffer);
+            daysBehindOriginalForLeaving++;
+          }
+          leaveTimeCalculated=true;
+        }
+        console.log(leaveTime);
+        if(timeToBeAtAirport < 0){
+          timeToBeAtAirport+=1440;
+          daysBehindOriginalForLeaving++;
+        }
+        console.log(timeToBeAtAirport);
+        var leaveMinute = (leaveTime+timeToBeAtAirport)%60;
+        var leaveHour = (leaveTime+timeToBeAtAirport - leaveMinute)/60;
+        var timeFromAirportToGate = leaveTime - tripLength;
+        var airportToGateHours = 0;
+        var airportToGateMinutes = 0;
+        var airportToGateStatement = "";
+        if(timeToBeAtAirport - timeFromAirportToGate < 0){
+          for(var i = 0; i <= parseInt((timeToBeAtAirport)/1440);i++){
+            daysBehindOriginalForBeingAtAirport++;
+          }
+          airportToGateMinutes = (timeFromAirportToGate - timeToBeAtAirport)%60;
+          airportToGateHours = (timeFromAirportToGate - timeToBeAtAirport - airportToGateMinutes-daysBehindOriginalForBeingAtAirport*1440)%60;
+          if(daysBehindOriginalForBeingAtAirport > 1){
+            airportToGateStatement = "You should leave the airport by " + airportToGateHours + ":" + airportToGateMinutes + " " + (daysBehindOriginalForBeingAtAirport) + " days before your flight.";
+          }
+          else if(daysBehindOriginalForBeingAtAirport == 1){
+            airportToGateStatement = "You should leave the airport by " + airportToGateHours + ":" + airportToGateMinutes + " the day before your flight.";
+          }
+          else if(daysBehindOriginalForBeingAtAirport == 0){
+            airportToGateStatement = "You leave the airport by " + airportToGateHours + ":" + airportToGateMinutes + " the day of your flight.";
+          }
+        }
+        else{
+          airportToGateMinutes = (timeToBeAtAirport-timeFromAirportToGate)%60;
+          airportToGateHours = (timeToBeAtAirport - timeFromAirportToGate - airportToGateMinutes)%60;
+          airportToGateStatement = "You should leave the airport by " + airportToGateHours + ":" + airportToGateMinutes + " the day of your flight";
+        }
+        if (daysBehindOriginalForLeaving==1){
+          console.log("You should be at the airport " + leaveHour + ":" + leaveMinute + " the day before your flight");
+          console.log(airportToGateStatement);
+        }
+          else if(daysBehindOriginalForLeaving>1){
+          console.log("You should be at the airport " + leaveHour + ":" + leaveMinute + " " + (daysBehindOriginalForLeaving) + " days before your flight");
+          console.log(airportToGateStatement);
+        }
+        else{
+          console.log("You should be at the airport " + leaveHour + ":" + leaveMinute + " the day of your flight");
+          console.log(airportToGateStatement);
+        }
 } catch (error) {
 	console.error(error);
 }
