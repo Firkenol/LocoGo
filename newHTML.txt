@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocoGo Timeline</title>
+<img src = "LocoGoLogo.png" alt = "LocoGo's Logo" style = "height: 4%; width: 4%;">
+<style>
+.vl {
+  border-left: 6px solid green;
+  height: 15%;
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  margin-left: auto;
+  margin-right: auto;
+}
+  </style>
+  
+  <div class="vl"></div>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+  }
+  .timeline {
+    z-index: 10;
+    display: flex;
+    justify-content:center;
+    flex-direction: column;
+    align-items: center;
+    max-width: 30px;
+    max-height: 30px;
+    margin: 50px auto;
+    padding: 250px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 250px rgba(0, 0, 0, 0.1);
+  }
+  .event {
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+  }
+  .event .time {
+    width: 40px;
+    height: 35px;
+    background-color: #ff5e62;
+    color: #fff;
+    border-radius: 150%;
+    text-align: center;
+    line-height: 30px;
+    font-size: 14px;
+  }
+  .event .content {
+    padding: 20px;
+    border-left: 2px solid #ff5e62;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    display: none;
+    position: absolute;
+    left: calc(100% + 20px);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    width: 200px;
+  }
+  .event:hover .content {
+    display: block;
+  }
+  .event h3 {
+    margin-top: 0;
+    color: #333;
+  }
+  .event p {
+    color: #666;
+  }
+</style>
+</head>
+<body>
+
+<div class="timeline">
+  <div class="event">
+    <div class="time">08:00</div>
+    <div class="content">
+      <h3>Depart your house</h3>
+      <p>Leave your house for the airport.</p>
+    </div>
+  </div>
+  <div class="event">
+    <div class="time">10:00</div>
+    <div class="content">
+      <h3>Arrive at the airport</h3>
+      <p>Arrive at the airport and head to your terminal</p>
+    </div>
+  </div>
+  <div class="event">
+    <div class="time">12:30</div>
+    <div class="content">
+      <h3>Arrive at your terminal</h3>
+      <p>Arrive at your terminal on time and relax</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
